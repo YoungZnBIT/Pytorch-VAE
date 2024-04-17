@@ -11,14 +11,13 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.utilities.seed import seed_everything
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from dataset import VAEDataset
-from pytorch_lightning.plugins import DDPPlugin
-
+from pytorch_lightning.strategies import DDPStrategy
 
 parser = argparse.ArgumentParser(description='Generic runner for VAE models')
-parser.add_argument('--config',  '-c',
+parser.add_argument('--config', '-c',
                     dest="filename",
                     metavar='FILE',
-                    help =  'path to the config file',
+                    help='path to the config file',
                     default='configs/vae.yaml')
 
 args = parser.parse_args()
@@ -28,9 +27,8 @@ with open(args.filename, 'r') as file:
     except yaml.YAMLError as exc:
         print(exc)
 
-
-tb_logger =  TensorBoardLogger(save_dir=config['logging_params']['save_dir'],
-                               name=config['model_params']['name'],)
+tb_logger = TensorBoardLogger(save_dir=config['logging_params']['save_dir'],
+                              name=config['model_params']['name'], )
 
 # For reproducibility
 seed_everything(config['exp_params']['manual_seed'], True)
@@ -42,21 +40,29 @@ experiment = VAEXperiment(model,
 data = VAEDataset(**config["data_params"], pin_memory=len(config['trainer_params']['gpus']) != 0)
 
 data.setup()
+# DDP模式，windows暂不支持
+# runner = Trainer(logger=tb_logger,
+#                  callbacks=[
+#                      LearningRateMonitor(),
+#                      ModelCheckpoint(save_top_k=2,
+#                                      dirpath=os.path.join(tb_logger.log_dir, "checkpoints"),
+#                                      monitor="val_loss",
+#                                      save_last=True),
+#                  ],
+#                  strategy=DDPStrategy(find_unused_parameters=False),
+#                  **config['trainer_params'])
 runner = Trainer(logger=tb_logger,
                  callbacks=[
                      LearningRateMonitor(),
-                     ModelCheckpoint(save_top_k=2, 
-                                     dirpath =os.path.join(tb_logger.log_dir , "checkpoints"), 
-                                     monitor= "val_loss",
-                                     save_last= True),
+                     ModelCheckpoint(save_top_k=2,
+                                     dirpath=os.path.join(tb_logger.log_dir, "checkpoints"),
+                                     monitor="val_loss",
+                                     save_last=True),
                  ],
-                 strategy=DDPPlugin(find_unused_parameters=False),
                  **config['trainer_params'])
-
 
 Path(f"{tb_logger.log_dir}/Samples").mkdir(exist_ok=True, parents=True)
 Path(f"{tb_logger.log_dir}/Reconstructions").mkdir(exist_ok=True, parents=True)
-
 
 print(f"======= Training {config['model_params']['name']} =======")
 runner.fit(experiment, datamodule=data)

@@ -22,6 +22,42 @@ for consistency and comparison. The architecture of all the models are kept as s
 a radically different architecture (Ex. VQ VAE uses Residual layers and no Batch-Norm, unlike other models).
 Here are the [results](https://github.com/AntixK/PyTorch-VAE/blob/master/README.md#--results) of each model.
 
+### step-by-step 教程
+
+1.本人系统：windows10，cuda版本：10.2
+
+2.代码安装
+```
+$ git clone https://github.com/AntixK/PyTorch-VAE
+$ cd PyTorch-VAE
+```
+
+3.环境配置(以本人系统为例)
+先安装依赖中的pytorch-lighting，再安装pytorch，否则导致pytorch版本被覆盖
+```
+$ pip install -r requirements.txt
+$ conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=10.2 -c pytorch
+```
+测试以下命令
+```
+$ python
+$ import torch
+$ torch.cuda.is_available()
+# 输出为True代表pytorch cuda环境配置成功
+```
+
+4.数据准备
+
+从以下链接下载公开数据
+
+[链接](https://drive.google.com/file/d/1m8-EBPgi5MRubrm6iQjafK2QMHDBMSfJ/view?usp=sharing)
+
+5.配置文件设置
+
+将yaml配置文件中data_params的data_path设置为解压文件的路径
+
+6.之间运行
+
 ### Requirements
 - Python >= 3.5
 - PyTorch >= 1.3
