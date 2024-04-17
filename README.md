@@ -45,6 +45,11 @@ $ import torch
 $ torch.cuda.is_available()
 # 输出为True代表pytorch cuda环境配置成功
 ```
+如果仍有报错，可尝试以下任务
+```
+$ pip install six
+$ pip install setuptools=59.5.0
+```
 
 4.数据准备
 
@@ -56,7 +61,16 @@ $ torch.cuda.is_available()
 
 将yaml配置文件中data_params的data_path设置为解压文件的路径
 
-6.之间运行
+
+6.直接运行run.py即可
+
+```
+$ python run.py
+```
+
+或者根据需要调整与选择yaml配置文件
+
+
 
 ### Requirements
 - Python >= 3.5
